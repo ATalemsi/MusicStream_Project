@@ -6,8 +6,8 @@ import {
   selectFilteredTracks,
   selectTrackError,
   selectTrackLoading
-} from "../../../store/track.selectors";
-import * as TrackActions from "../../../store/track.actions";
+} from "../../../store/track/track.selectors";
+import * as TrackActions from "../../../store/track/track.actions";
 import { AsyncPipe, NgForOf, NgIf, NgOptimizedImage } from "@angular/common";
 import { trigger, transition, style, animate, stagger, query } from '@angular/animations';
 import { Router } from '@angular/router';

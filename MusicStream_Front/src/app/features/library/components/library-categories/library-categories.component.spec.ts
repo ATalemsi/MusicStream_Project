@@ -3,8 +3,8 @@ import { LibraryCategoriesComponent } from './library-categories.component';
 import { MusicCategory } from '../../../../core/models/track.model';
 import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
-import * as TrackActions from '../../../store/track.actions';
-import { selectSelectedCategory } from '../../../store/track.selectors';
+import * as TrackActions from '../../../store/track/track.actions';
+import { selectSelectedCategory } from '../../../store/track/track.selectors';
 
 interface AppState {
   track: {

@@ -1,5 +1,5 @@
 import {createAction, props} from "@ngrx/store";
-import {MusicCategory, Track} from "../../core/models/track.model";
+import {MusicCategory, Track} from "../../../core/models/track.model";
 
 //load Tracks
 export const loadTracks = createAction('[Track] Load Tracks');

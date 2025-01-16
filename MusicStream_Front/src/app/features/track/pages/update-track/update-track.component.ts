@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 import { MusicCategory, Track } from '../../../../core/models/track.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as TrackActions from '../../../store/track.actions';
-import { selectTrackById } from '../../../store/track.selectors';
+import * as TrackActions from '../../../store/track/track.actions';
+import { selectTrackById } from '../../../store/track/track.selectors';
 import { NavbarComponent } from '../../../navbar/navbar.component';
 import { NgForOf, NgIf } from '@angular/common';
 

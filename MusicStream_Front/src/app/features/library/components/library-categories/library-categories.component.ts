@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import {MusicCategory} from "../../../../core/models/track.model";
 import {KeyValuePipe, NgForOf, TitleCasePipe} from "@angular/common";
 import {Observable} from "rxjs";
-import {selectSelectedCategory} from "../../../store/track.selectors";
+import {selectSelectedCategory} from "../../../store/track/track.selectors";
 import {Store} from "@ngrx/store";
-import * as TrackActions from "../../../store/track.actions";
+import * as TrackActions from "../../../store/track/track.actions";
 
 @Component({
   selector: 'app-library-categories',

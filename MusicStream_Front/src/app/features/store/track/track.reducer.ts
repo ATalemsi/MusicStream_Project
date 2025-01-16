@@ -1,4 +1,4 @@
-import {MusicCategory, Track} from "../../core/models/track.model";
+import {MusicCategory, Track} from "../../../core/models/track.model";
 import {createReducer, on} from "@ngrx/store";
 import * as TrackActions from './track.actions';
 

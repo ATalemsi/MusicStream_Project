@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AddTrackComponent } from './add-track.component';
 import { MusicCategory } from '../../../../core/models/track.model';
-import * as TrackActions from '../../../store/track.actions';
+import * as TrackActions from '../../../store/track/track.actions';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../../navbar/navbar.component';

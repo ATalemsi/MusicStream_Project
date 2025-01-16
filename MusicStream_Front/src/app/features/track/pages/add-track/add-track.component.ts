@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { MusicCategory, Track } from "../../../../core/models/track.model";
-import * as TrackActions from "../../../store/track.actions";
+import * as TrackActions from "../../../store/track/track.actions";
 import {CommonModule} from "@angular/common";
 import {NavbarComponent} from "../../../navbar/navbar.component";
 

@@ -3,8 +3,8 @@ import {Observable, Subscription, filter, take, switchMap} from 'rxjs';
 import {PlayerState, Track} from "../../../../core/models/track.model";
 import {ActivatedRoute, Router, ParamMap} from "@angular/router";
 import {Store} from "@ngrx/store";
-import * as TrackActions from "../../../store/track.actions"
-import {selectTrackById, selectAllTracks} from "../../../store/track.selectors";
+import * as TrackActions from "../../../store/track/track.actions"
+import {selectTrackById, selectAllTracks} from "../../../store/track/track.selectors";
 import {AsyncPipe, NgIf, NgOptimizedImage} from "@angular/common";
 import {AudioPlayerService} from "../../../../core/services/audio-player/audio-player.service";
 import {TrackService} from "../../../../core/services/track/track.service";
