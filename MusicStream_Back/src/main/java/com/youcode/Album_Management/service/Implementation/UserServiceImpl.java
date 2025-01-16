@@ -5,6 +5,7 @@ import com.youcode.Album_Management.dto.response.UserResponseDTO;
 import com.youcode.Album_Management.entity.Role;
 import com.youcode.Album_Management.entity.User;
 import com.youcode.Album_Management.exception.ResourceNotFoundException;
+import com.youcode.Album_Management.exception.UsernameAlreadyExistsException;
 import com.youcode.Album_Management.mapper.UserMapper;
 import com.youcode.Album_Management.repository.RoleRepository;
 import com.youcode.Album_Management.repository.UserRepository;
@@ -33,6 +34,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO register(UserRequestDTO userDTO) {
+        // Check if username already exists
+        if (userRepository.existsByUsername(userDTO.getUsername())) {
+            throw new UsernameAlreadyExistsException("Username already exists: " + userDTO.getUsername());
+        }
+
         User user = userMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -51,13 +57,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll().stream().map(userMapper::toDTO).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(userMapper::toDTO).toList();
     }
 
     @Override
     public void updateUserRoles(String id, List<String> roles) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        List<Role> updatedRoles = roles.stream().map(roleRepository::findByName).collect(Collectors.toList());
+        List<Role> updatedRoles = roles.stream().map(roleRepository::findByName).toList();
         user.setRoles(updatedRoles);
         userRepository.save(user);
     }
