@@ -24,7 +24,7 @@ public class AlbumController {
 
 
     @GetMapping({"/user/albums", "/admin/albums"})
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN','CONTENT_MANAGER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Page<AlbumResponseDTO>> getAllAlbums(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -34,7 +34,7 @@ public class AlbumController {
     }
 
     @GetMapping({"/user/albums/search", "/admin/albums/search"})
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN','CONTENT_MANAGER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Page<AlbumResponseDTO>> searchAlbumsByTitle(
             @RequestParam String title,
             @RequestParam(defaultValue = "0") int page,
@@ -45,7 +45,7 @@ public class AlbumController {
     }
 
     @GetMapping({"/user/albums/artist", "/admin/albums/artist"})
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN','CONTENT_MANAGER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Page<AlbumResponseDTO>> searchAlbumsByArtist(
             @RequestParam String artist,
             @RequestParam(defaultValue = "0") int page,
@@ -56,7 +56,7 @@ public class AlbumController {
     }
 
     @GetMapping({"/user/albums/year", "/admin/albums/year"})
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN','CONTENT_MANAGER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Page<AlbumResponseDTO>> filterAlbumsByYear(
             @RequestParam Integer year,
             @RequestParam(defaultValue = "0") int page,
@@ -85,10 +85,4 @@ public class AlbumController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/content_manager/albums/title/{id}")
-    @PreAuthorize("hasRole('CONTENT_MANAGER')")
-    public ResponseEntity<List<AlbumResponseDTO>> updateAlbumTitle(@PathVariable String id , @RequestBody TitleAlbumUpdateDto albumDTO) {
-             return ResponseEntity.ok(albumService.updateTitleAlbum(id ,albumDTO));
-
-    }
 }
