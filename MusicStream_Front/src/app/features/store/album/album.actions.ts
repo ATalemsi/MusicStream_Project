@@ -15,7 +15,35 @@ export const loadAlbumsFailure = createAction(
   '[Album] Load Albums Failure',
   props<{ error: string }>()
 );
+export const loadAlbumById = createAction(
+  '[Album] Load Album By ID',
+  props<{ id: string }>()
+);
 
+export const loadAlbumByIdSuccess = createAction(
+  '[Album] Load Album By ID Success',
+  props<{ album: Album }>()
+);
+
+export const loadAlbumByIdFailure = createAction(
+  '[Album] Load Album By ID Failure',
+  props<{ error: string }>()
+);
+
+export const loadAlbum = createAction(
+  '[Album] Load Album',
+  props<{ id: string }>()
+);
+
+export const loadAlbumSuccess = createAction(
+  '[Album] Load Album Success',
+  props<{ album: Album }>()
+);
+
+export const loadAlbumFailure = createAction(
+  '[Album] Load Album Failure',
+  props<{ error: any }>()
+);
 
 export const searchAlbumsByTitle = createAction(
   '[Album] Search Albums By Title',
@@ -109,4 +137,12 @@ export const deleteAlbumSuccess = createAction(
 export const deleteAlbumFailure = createAction(
   '[Album] Delete Album Failure',
   props<{ error: string }>()
+);
+
+export const resetAlbumState = createAction(
+  '[Album] Reset Album State'
+);
+export const setActionSuccess = createAction(
+  '[Album] Set Action Success',
+  props<{ success: boolean }>()
 );

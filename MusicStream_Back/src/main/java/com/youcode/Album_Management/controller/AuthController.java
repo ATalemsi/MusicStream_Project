@@ -78,8 +78,6 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorization) {
         String token = authorization.replace("Bearer ", "");
-
-
         tokenBlacklistService.blacklistToken(token);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

@@ -90,7 +90,23 @@ export const albumReducer = createReducer(
     loading: false,
     error
   })),
-
+  // Load Album by ID
+  on(AlbumActions.loadAlbumById, (state) => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+  on(AlbumActions.loadAlbumByIdSuccess, (state, { album }) => ({
+    ...state,
+    selectedAlbum: album,
+    loading: false,
+    error: null
+  })),
+  on(AlbumActions.loadAlbumByIdFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error
+  })),
   // Create Album
   on(AlbumActions.createAlbum, (state) => ({
     ...state,
@@ -146,5 +162,16 @@ export const albumReducer = createReducer(
     ...state,
     loading: false,
     error
-  }))
+  })),
+  // Reset State
+  on(AlbumActions.resetAlbumState, () => ({
+    ...initialState
+  })),
+
+  // Set Action Success
+  on(AlbumActions.setActionSuccess, (state, { success }) => ({
+    ...state,
+    actionSuccess: success
+  })),
+
 );

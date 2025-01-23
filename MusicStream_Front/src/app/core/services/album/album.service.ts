@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Album, AlbumRequest, PageResponse } from '../../models/album.model';
 import { Observable } from 'rxjs';
+import { environment} from "../../../../environments/environment";
 
 @Injectable({
   providedIn: 'root',
 })
 export class AlbumService {
-  private readonly apiUrl = 'http://localhost:8080/api';
+  private readonly apiUrl = `${environment.apiUrl}/api`;
 
   constructor(private readonly http: HttpClient) {}
 
@@ -67,5 +68,9 @@ export class AlbumService {
   // Delete an album
   deleteAlbum(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/admin/albums/${id}`);
+  }
+
+  getAlbumById(id: string): Observable<Album> {
+    return this.http.get<Album>(`${this.apiUrl}/admin/albums/detail_album/${id}`);
   }
 }

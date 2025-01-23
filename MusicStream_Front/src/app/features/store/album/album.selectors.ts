@@ -45,3 +45,9 @@ export const selectSelectedAlbum = createSelector(
   selectAlbumState,
   (state: AlbumState) => state.selectedAlbum
 );
+
+export const selectAlbumById = (id: string) =>
+  createSelector(selectAlbumsContent, (albums) =>
+    albums.find(album => album.id === id)
+  );
+export const selectAlbumDetails = createSelector(selectAlbumState, (state: AlbumState) => state.selectedAlbum)

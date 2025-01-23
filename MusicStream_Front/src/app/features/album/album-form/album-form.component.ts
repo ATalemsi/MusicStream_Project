@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {selectError, selectLoading} from "../../store/album/album.selectors";
+import {selectAlbumById, selectError, selectLoading} from "../../store/album/album.selectors";
 import {Store} from "@ngrx/store";
 import {ActivatedRoute, Router} from "@angular/router";
 import * as AlbumActions from '../../store/album/album.actions';
@@ -18,7 +18,7 @@ import {AsyncPipe, NgClass, NgIf} from "@angular/common";
   templateUrl: './album-form.component.html',
   styleUrl: './album-form.component.scss'
 })
-export class AlbumFormComponent {
+export class AlbumFormComponent implements OnInit {
   albumForm: FormGroup;
   isEditing = false;
   albumId: string | null = null;
@@ -42,7 +42,18 @@ export class AlbumFormComponent {
     this.albumId = this.route.snapshot.paramMap.get('id');
     if (this.albumId) {
       this.isEditing = true;
-      // You would typically load the album details here
+
+      this.store.dispatch(AlbumActions.loadAlbumById({ id: this.albumId }));
+
+      this.store.select(selectAlbumById(this.albumId)).subscribe(album => {
+        if (album) {
+          this.albumForm.patchValue({
+            title: album.title,
+            artist: album.artist,
+            year: album.year
+          });
+        }
+      });
     }
   }
 
@@ -65,5 +76,5 @@ export class AlbumFormComponent {
     this.router.navigate(['/albums']);
   }
 
-  protected readonly Date = Date;
+  protected readonly Date = new Date().getFullYear();
 }

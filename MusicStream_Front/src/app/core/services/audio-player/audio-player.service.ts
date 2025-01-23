@@ -63,15 +63,6 @@ export class AudioPlayerService {
       if (this.currentTrack?.id !== track.id) {
         this.currentTrack = track;
         this.playerStateSubject.next(PlayerState.LOADING);
-        const audioFile = await this.trackService.getAudioFile(track.id).toPromise();
-        if (!audioFile) {
-          throw new Error('Audio file not found');
-        }
-        const blobUrl = URL.createObjectURL(audioFile);
-        this.audioElement.src = blobUrl;
-        this.audioElement.onload = () => {
-          URL.revokeObjectURL(blobUrl);
-        };
       }
       await this.audioElement.play();
       this.playerStateSubject.next(PlayerState.PLAYING);

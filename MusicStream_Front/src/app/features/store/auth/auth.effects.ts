@@ -89,7 +89,7 @@ export class AuthEffects {
         tap(action => {
           console.log('Auth Success Action:', action); // Debug log
           localStorage.setItem('token', action.token);
-          this.router.navigate(['/library']).then(
+          this.router.navigate(['/albums']).then(
             success => console.log('Navigation result:', success),
             error => console.error('Navigation error:', error)
           );

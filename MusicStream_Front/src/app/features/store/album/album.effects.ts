@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
+import {of, switchMap} from 'rxjs';
 import { map, mergeMap, catchError } from 'rxjs/operators';
 import * as AlbumActions from './album.actions';
 import { AlbumService } from '../../../core/services/album/album.service'
@@ -20,6 +20,20 @@ export class AlbumEffects {
     )
   );
 
+
+  loadAlbumById$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AlbumActions.loadAlbumById),
+      switchMap(({ id }) =>
+        this.albumService.getAlbumById(id).pipe(
+          map(album => AlbumActions.loadAlbumByIdSuccess({ album })),
+          catchError(error =>
+            of(AlbumActions.loadAlbumByIdFailure({ error: error.message }))
+          )
+        )
+      )
+    )
+  );
   searchByTitle$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AlbumActions.searchAlbumsByTitle),

@@ -24,12 +24,6 @@ export const routes: Routes = [
     canActivate: [() => AuthGuard(['ROLE_USER','ROLE_ADMIN'])],
   },
   {
-    path: 'track/add',
-    loadComponent: () =>
-      import('./features/track/pages/add-track/add-track.component').then(m => m.AddTrackComponent),
-    canActivate: [() => AuthGuard(['ROLE_ADMIN'])],
-  },
-  {
     path: 'track/:id',
     loadComponent: () =>
       import('./features/track/components/track-detail/track-detail.component').then(m => m.TrackDetailComponent),
@@ -64,7 +58,19 @@ export const routes: Routes = [
           import('./features/album/album-form/album-form.component')
             .then(m => m.AlbumFormComponent),
         canActivate: [() => AuthGuard(['ROLE_ADMIN'])],
-      }
+      },
+      {
+        path: ":id",
+        loadComponent: () =>
+          import("./features/album/album-details/album-details.component").then((m) => m.AlbumDetailsComponent),
+        canActivate: [() => AuthGuard(["ROLE_USER", "ROLE_ADMIN"])],
+      },
+      {
+        path: ":id/add-track",
+        loadComponent: () =>
+          import("./features/track/pages/add-track/add-track.component").then((m) => m.AddTrackComponent),
+        canActivate: [() => AuthGuard(["ROLE_ADMIN"])],
+      },
     ]
   },
   { path: '**', redirectTo: 'auth/login' },

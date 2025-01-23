@@ -18,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class AlbumController {
 
     private final AlbumService albumService;
@@ -84,5 +85,13 @@ public class AlbumController {
         albumService.deleteAlbum(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping({"/user/albums/detail_album/{id}", "/admin/albums/detail_album/{id}"})
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<AlbumResponseDTO> getAlbumById(@PathVariable String id) {
+        AlbumResponseDTO albumResponseDTO = albumService.getAlbumById(id);
+        return ResponseEntity.ok(albumResponseDTO);
+    }
+
 
 }

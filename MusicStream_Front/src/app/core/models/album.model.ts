@@ -1,11 +1,11 @@
-import {Track} from "./track.model";
+import {SongResponseDTO, Track} from "./track.model";
 
 export interface Album {
   id: string;
-  titre: string;
-  artiste: string;
-  annee: number;
-  songs?: Track[];
+  title: string;
+  artist: string;
+  year: number;
+  songs?: SongResponseDTO[];
 }
 
 
