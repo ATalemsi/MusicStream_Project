@@ -6,7 +6,7 @@ import { AudioPlayerService } from '../../../../core/services/audio-player/audio
 import { TrackService } from '../../../../core/services/track/track.service';
 import { MusicCategory, PlayerState, Track } from '../../../../core/models/track.model';
 import { BehaviorSubject, of, Subject } from 'rxjs';
-import * as TrackActions from '../../../store/track.actions';
+import * as TrackActions from '../../../store/track/track.actions';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { AsyncPipe, NgIf, NgOptimizedImage } from '@angular/common';
 

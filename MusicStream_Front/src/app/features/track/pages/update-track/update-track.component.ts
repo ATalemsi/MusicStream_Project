@@ -4,16 +4,12 @@ import { Observable } from 'rxjs';
 import { MusicCategory, Track } from '../../../../core/models/track.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as TrackActions from '../../../store/track.actions';
-import { selectTrackById } from '../../../store/track.selectors';
-import { NavbarComponent } from '../../../navbar/navbar.component';
 import { NgForOf, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-update-track',
   standalone: true,
   imports: [
-    NavbarComponent,
     NgForOf,
     NgIf,
     ReactiveFormsModule,
@@ -38,17 +34,7 @@ export class UpdateTrackComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.trackId = this.route.snapshot.paramMap.get('id');
-    if (this.trackId) {
-      this.store.dispatch(TrackActions.loadTrack({ id: this.trackId }));
-      this.track$ = this.store.select(selectTrackById(this.trackId));
-
-      this.track$.subscribe(track => {
-        if (track) {
-          this.initializeForm(track);
-        }
-      });
-    }
+    this.successMessage ="jsdjsdf"
   }
 
   initializeForm(track: Track): void {
@@ -120,23 +106,5 @@ export class UpdateTrackComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.trackForm.valid) {
-      const updatedTrack = {
-        id: this.trackId,
-        ...this.trackForm.value,
-        audioFile: this.selectedAudioFile || null
-      };
-      this.store.dispatch(
-        TrackActions.updateTrack({ updatedTrack: updatedTrack, audioFile: this.selectedAudioFile })
-      );
-      this.successMessage = 'Track updated successfully!';
-      setTimeout(() => {
-        this.router.navigate(['/library']).catch(err => {
-          console.error('Navigation error:', err);
-        });
-      }, 2000);
-    } else {
-      console.error('Form is invalid');
-    }
   }
 }

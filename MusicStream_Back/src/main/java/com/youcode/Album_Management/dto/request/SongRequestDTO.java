@@ -1,5 +1,6 @@
 package com.youcode.Album_Management.dto.request;
 
+import com.youcode.Album_Management.entity.enums.MusicCategory;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -24,4 +25,11 @@ public class SongRequestDTO {
 
     @NotBlank(message = "Album ID is required")
     private String albumId;
+
+    private MusicCategory category; // You can also use an enum for MusicCategory
+
+    @NotBlank(message = "L'ID du fichier audio est obligatoire")
+    private String audioFileId;
+
+    private String imageUrl;
 }

@@ -1,78 +1,92 @@
-import {MusicCategory, Track} from "../../core/models/track.model";
-import {createReducer, on} from "@ngrx/store";
-import * as TrackActions from './track.actions';
+import { createReducer, on } from "@ngrx/store"
+import type { SongResponseDTO} from "../../../core/models/track.model";
+import * as TrackActions from "./track.actions"
 
 export interface TrackState {
-  imageLoadErrors: any;
-  tracks: Track[];
-  selectedTrack: Track | null;
-  loading: boolean;
-  error: string | null;
-  selectedCategory: MusicCategory | null;
+  tracks: SongResponseDTO[]
+  loading: boolean
+  error: string | null
 }
 
-const initialState: TrackState = {
+export const initialState: TrackState = {
   tracks: [],
-  imageLoadErrors: null,
-  selectedTrack: null,
   loading: false,
   error: null,
-  selectedCategory: null
 }
 
 export const trackReducer = createReducer(
   initialState,
-  on(TrackActions.loadTracks, (state) => ({
-    ...state,
-    loading: true,
-    error: null
-  })),
+  on(TrackActions.loadTracks, (state) => ({ ...state, loading: true })),
   on(TrackActions.loadTracksSuccess, (state, { tracks }) => ({
     ...state,
     tracks,
     loading: false,
-    error: null
+    error: null,
   })),
-
   on(TrackActions.loadTracksFailure, (state, { error }) => ({
     ...state,
     loading: false,
-    error
+    error,
   })),
-
-  on(TrackActions.addTrackSuccess, (state, {track}) => ({
+  on(TrackActions.searchTracks, (state) => ({ ...state, loading: true })),
+  on(TrackActions.searchTracksSuccess, (state, { tracks }) => ({
     ...state,
-    loading: !state.loading,
+    tracks,
+    loading: false,
+    error: null,
+  })),
+  on(TrackActions.searchTracksFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error,
+  })),
+  on(TrackActions.loadTracksByAlbum, (state) => ({ ...state, loading: true })),
+  on(TrackActions.loadTracksByAlbumSuccess, (state, { tracks }) => ({
+    ...state,
+    tracks,
+    loading: false,
+    error: null,
+  })),
+  on(TrackActions.loadTracksByAlbumFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error,
+  })),
+  on(TrackActions.createTrack, (state) => ({ ...state, loading: true })),
+  on(TrackActions.createTrackSuccess, (state, { track }) => ({
+    ...state,
     tracks: [...state.tracks, track],
+    loading: false,
+    error: null,
   })),
-  on(TrackActions.addTrackFailure, (state, {error}) => ({...state, error})),
-
-
-  on(TrackActions.updateTrackSuccess, (state, {track}) => ({
+  on(TrackActions.createTrackFailure, (state, { error }) => ({
     ...state,
-    loading: !state.loading,
-    tracks: state.tracks.map((t) => (t.id === track.id) ? track : t),
+    loading: false,
+    error,
   })),
-  on(TrackActions.updateTrackFailure, (state, {error}) => ({...state, error})),
-
-
-
-  on(TrackActions.deleteTrackSuccess, (state, {id}) => ({
+  on(TrackActions.updateTrack, (state) => ({ ...state, loading: true })),
+  on(TrackActions.updateTrackSuccess, (state, { track }) => ({
+    ...state,
+    tracks: state.tracks.map((t) => (t.id === track.id ? track : t)),
+    loading: false,
+    error: null,
+  })),
+  on(TrackActions.updateTrackFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error,
+  })),
+  on(TrackActions.deleteTrack, (state) => ({ ...state, loading: true })),
+  on(TrackActions.deleteTrackSuccess, (state, { id }) => ({
     ...state,
     tracks: state.tracks.filter((t) => t.id !== id),
+    loading: false,
+    error: null,
   })),
-
-  on(TrackActions.deleteTrackFailure, (state, {error}) => ({...state, error})),
-
-  on(TrackActions.setSelectedCategory, (state, { category }) => ({
+  on(TrackActions.deleteTrackFailure, (state, { error }) => ({
     ...state,
-    selectedCategory: category
+    loading: false,
+    error,
   })),
-  on(TrackActions.imageLoadError, (state, { trackId }) => ({
-    ...state,
-    imageLoadErrors: {
-      ...state.imageLoadErrors,
-      [trackId]: true
-    }
-  }))
 )
+

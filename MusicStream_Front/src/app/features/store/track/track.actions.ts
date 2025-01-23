@@ -1,63 +1,49 @@
-import {createAction, props} from "@ngrx/store";
-import {MusicCategory, Track} from "../../core/models/track.model";
-
-//load Tracks
-export const loadTracks = createAction('[Track] Load Tracks');
-export const loadTracksSuccess = createAction('[Track] Load Tracks Success', props<{ tracks: Track[] }>());
-export const loadTracksFailure = createAction('[Track] Load Tracks Failure', props<{ error: string }>());
-export const loadTrack = createAction('[Track] Load Track', props<{ id: string }>());
-export const loadTrackSuccess = createAction('[Track] Load Track Success', props<{ track: Track }>());
-export const loadTrackFailure = createAction('[Track] Load Track Failure', props<{ error: string }>());
-
-//add track
-export const addTrack = createAction(
-  '[Track] Add Track',
-  props<{
-    track: Track;
-    audioFile: Blob;
-    imageFile?: File;
-  }>()
-);
-export const addTrackSuccess=createAction('[Track] Add Track Success', props<{ track: Track }>());
-export const addTrackFailure=createAction('[Track] Add Track Failure', props<{ error: string }>());
-
-//update Track
-export const updateTrack = createAction(
-  '[Track] Update Track',
-  props<{ updatedTrack: Track, audioFile: Blob | null  }>()
-);
-export const updateTrackSuccess=createAction('[Track] Update Track Success', props<{ track: Track }>());
-export const updateTrackFailure=createAction('[Track] Update Track Failure', props<{ error: string }>());
-
-//delete Track
-export const deleteTrack=createAction('[Track] Delete Track', props<{ id: string }>());
-export const deleteTrackSuccess=createAction('[Track] Delete Track Success', props<{ id: string }>());
-export const deleteTrackFailure = createAction('[Track] Delete Track Failure', props<{ error: string }>());
+import { createAction, props } from "@ngrx/store"
+import {SongRequestDTO, SongResponseDTO} from "../../../core/models/track.model";
 
 
+export const loadTracks = createAction("[Track] Load Tracks", props<{ page: number; size: number; sortBy: string }>())
 
-//filtrage with categories
-export const setSelectedCategory = createAction(
-  '[Track] Set Selected Category',
-  props<{ category: MusicCategory | null }>()
-);
+export const loadTracksSuccess = createAction("[Track] Load Tracks Success", props<{ tracks: SongResponseDTO[] }>())
 
-export const loadTrackImage = createAction(
-  '[Track] Load Track Image',
-  props<{ trackId: string }>()
-);
+export const loadTracksFailure = createAction("[Track] Load Tracks Failure", props<{ error: string }>())
 
-export const loadTrackImageSuccess = createAction(
-  '[Track] Load Track Image Success',
-  props<{ trackId: string; imageUrl: string }>()
-);
+export const searchTracks = createAction(
+  "[Track] Search Tracks",
+  props<{ title: string; page: number; size: number; sortBy: string }>(),
+)
 
-export const loadTrackImageFailure = createAction(
-  '[Track] Load Track Image Failure',
-  props<{ trackId: string; error: string }>()
-);
+export const searchTracksSuccess = createAction("[Track] Search Tracks Success", props<{ tracks: SongResponseDTO[] }>())
 
-export const imageLoadError = createAction(
-  '[Track] Image Load Error',
-  props<{ trackId: string }>()
-);
+export const searchTracksFailure = createAction("[Track] Search Tracks Failure", props<{ error: string }>())
+
+export const loadTracksByAlbum = createAction(
+  "[Track] Load Tracks By Album",
+  props<{ albumId: string; page: number; size: number; sortBy: string }>(),
+)
+
+export const loadTracksByAlbumSuccess = createAction(
+  "[Track] Load Tracks By Album Success",
+  props<{ tracks: SongResponseDTO[] }>(),
+)
+
+export const loadTracksByAlbumFailure = createAction("[Track] Load Tracks By Album Failure", props<{ error: string }>())
+
+export const createTrack = createAction("[Track] Create Track", props<{ track: SongRequestDTO }>())
+
+export const createTrackSuccess = createAction("[Track] Create Track Success", props<{ track: SongResponseDTO }>())
+
+export const createTrackFailure = createAction("[Track] Create Track Failure", props<{ error: string }>())
+
+export const updateTrack = createAction("[Track] Update Track", props<{ id: string; track: SongRequestDTO }>())
+
+export const updateTrackSuccess = createAction("[Track] Update Track Success", props<{ track: SongResponseDTO }>())
+
+export const updateTrackFailure = createAction("[Track] Update Track Failure", props<{ error: string }>())
+
+export const deleteTrack = createAction("[Track] Delete Track", props<{ id: string }>())
+
+export const deleteTrackSuccess = createAction("[Track] Delete Track Success", props<{ id: string }>())
+
+export const deleteTrackFailure = createAction("[Track] Delete Track Failure", props<{ error: string }>())
+

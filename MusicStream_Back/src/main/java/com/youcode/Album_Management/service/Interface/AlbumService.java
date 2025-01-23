@@ -17,4 +17,5 @@ public interface AlbumService {
     AlbumResponseDTO updateAlbum(String id, AlbumRequestDTO albumDTO);
     void deleteAlbum(String id);
     List<AlbumResponseDTO> updateTitleAlbum(String id , TitleAlbumUpdateDto titleAlbumUpdateDto);
+    AlbumResponseDTO getAlbumById(String id);
 }

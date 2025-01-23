@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { MusicCategory, Track } from "../../../../core/models/track.model";
-import * as TrackActions from "../../../store/track.actions";
+import {MusicCategory, SongRequestDTO, Track} from "../../../../core/models/track.model";
+import * as TrackActions from "../../../store/track/track.actions";
 import {CommonModule} from "@angular/common";
 import {NavbarComponent} from "../../../navbar/navbar.component";
+import {ActivatedRoute, Router} from "@angular/router";
+import {UploadFileService} from "../../../../core/services/upload-file/upload-file.service";
 
 @Component({
   selector: 'app-add-track',
@@ -15,182 +17,97 @@ import {NavbarComponent} from "../../../navbar/navbar.component";
   templateUrl: './add-track.component.html',
   styleUrl: './add-track.component.scss'
 })
-export class AddTrackComponent {
-  trackForm: FormGroup;
-  imagePreview: string | null = null;
-  categories: MusicCategory[] = Object.values(MusicCategory);
+export class AddTrackComponent implements OnInit {
+    trackForm: FormGroup
+    albumId: string | undefined
+    categories = Object.values(MusicCategory)
+    audioFile: File | null = null
+    imageFile: File | null = null
 
-  constructor(private readonly store: Store, private readonly fb: FormBuilder) {
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly store: Store,
+    private readonly route: ActivatedRoute,
+    protected readonly router: Router,
+    private readonly fileService: UploadFileService
+  ) {
     this.trackForm = this.fb.group({
-      title: ['', [Validators.required, Validators.maxLength(40)]],
-      artist: ['', Validators.required],
-      description: ['', [Validators.maxLength(200)]],
-      category: [MusicCategory.POP],
-      audioFile: [null, Validators.required],
-      imageFile: [null , Validators.required]
-    });
+      title: ["", Validators.required],
+      artist: ["", Validators.required],
+      description: [""],
+      duration: [0, [Validators.required, Validators.min(0)]],
+      category: [MusicCategory.OTHER, Validators.required],
+    })
   }
-  validateTrackMetadata(): boolean {
-    const { title, description } = this.trackForm.value;
-    if (title.length > 50) {
-      alert("Title cannot be longer than 50 characters.");
-      return false;
-    }
-    if (description && description.length > 200) {
-      alert("Description cannot be longer than 200 characters.");
-      return false;
-    }
-    return true;
+  ngOnInit() {
+    this.albumId = this.route.snapshot.paramMap.get("id") ?? ""
   }
 
-
-  validateAudioFile(file: Blob): boolean {
-    console.log(`File type: ${file.type}, File size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`);
-    const MAX_FILE_SIZE_MB = 15;
-
-    const allowedMimeTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg'];
-
-    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      alert(`File size exceeds ${MAX_FILE_SIZE_MB}MB. Please upload a smaller file.`);
-      return false;
-    }
-
-    if (!allowedMimeTypes.includes(file.type)) {
-      alert("Invalid file type. Only MP3, WAV, and OGG files are allowed.");
-      return false;
-    }
-
-    return true;
-  }
-
-  validateImageFile(file: File): boolean {
-    const MAX_IMAGE_SIZE_MB = 5;
-    const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
-
-    if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
-      alert(`Image size exceeds ${MAX_IMAGE_SIZE_MB}MB. Please upload a smaller image.`);
-      return false;
-    }
-
-    if (!allowedImageTypes.includes(file.type)) {
-      alert("Invalid image type. Only JPEG, PNG, and WebP images are allowed.");
-      return false;
-    }
-
-    return true;
-  }
-
-  onImageChange(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-
+  onAudioFileChange(event: Event) {
+    const element = event.currentTarget as HTMLInputElement
+    const file = element.files ? element.files[0] : null
     if (file) {
-      if (this.validateImageFile(file)) {
-        this.trackForm.patchValue({ imageFile: file });
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.imagePreview = reader.result as string; // This will be a base64 string
-        };
-        reader.readAsDataURL(file); // Read the file as a data URL
-      } else {
-        this.trackForm.patchValue({ imageFile: null });
-        this.imagePreview = null;
-      }
+      this.audioFile = file
     }
   }
 
-  removeImage(): void {
-    this.trackForm.patchValue({ imageFile: null });
-    this.imagePreview = null;
-  }
-
-
-  private getAudioDuration(file: Blob): Promise<number> {
-    return new Promise((resolve, reject) => {
-      const audioElement = new Audio();
-      audioElement.preload = 'metadata';
-
-      audioElement.onloadedmetadata = () => {
-        window.URL.revokeObjectURL(audioElement.src);
-        resolve(Math.round(audioElement.duration * 1000));
-      };
-
-      audioElement.onerror = () => {
-        window.URL.revokeObjectURL(audioElement.src);
-        reject(new Error('Error loading audio file'));
-      };
-
-      audioElement.src = URL.createObjectURL(file);
-    });
-  }
-
-  async onSubmit(): Promise<void> {
-    if (this.trackForm.invalid || !this.validateTrackMetadata() || !this.validateAudioFile(this.trackForm.value.audioFile) || (this.trackForm.value.imageFile && !this.validateImageFile(this.trackForm.value.imageFile))) {
-      alert("Please check the form for validation errors.");
-      return;
-    }
-    console.log(this.trackForm.value);
-    if (this.trackForm.invalid) {
-      alert("Please fill out all required fields");
-      return;
-    }
-
-    const {title, artist, description, category, audioFile , imageFile} = this.trackForm.value;
-
-    console.log('Audio File:', audioFile);
-    console.log('Image File:', imageFile);
-
-    if (audioFile) {
-      try {
-        const duration = await this.getAudioDuration(audioFile);
-         const idT  =this.generateId();
-        const track: Track = {
-          id:idT ,
-          title,
-          artist,
-          description,
-          addedAt: new Date(),
-          duration,
-          category,
-          fileUrl: URL.createObjectURL(audioFile),
-          imageUrl: imageFile ? URL.createObjectURL(imageFile) : undefined,
-          imageFileId:idT
-        };
-
-        console.log('Track:', track);
-        this.store.dispatch(TrackActions.addTrack({track, audioFile, imageFile}));
-
-        alert("Track submission initiated");
-        this.resetForm();
-      } catch (error) {
-        console.error('Error getting audio duration:', error);
-        alert("Error processing audio file. Please try again.");
-      }
-    } else {
-      alert("Audio file is required.");
-    }
-    this.resetForm();
-  }
-
-  onFileChange(event: any): void {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('audio/')) {
-      this.trackForm.patchValue({ audioFile: file });
-    } else {
-      alert("Please upload a valid audio file");
-      this.trackForm.patchValue({ audioFile: null });
+  onImageFileChange(event: Event) {
+    const element = event.currentTarget as HTMLInputElement
+    const file = element.files ? element.files[0] : null
+    if (file) {
+      this.imageFile = file
     }
   }
 
-  resetForm(): void {
-    this.trackForm.reset({
-      category: MusicCategory.POP,
-      audioFile: null,
-      imageFile: null
-    });
+  onSubmit() {
+    if (this.trackForm.valid && this.audioFile) {
+      // Upload the audio file
+      this.fileService.uploadFile(this.audioFile).subscribe({
+        next: (event: any) => {
+          if (event.body) {
+            const audioFileId = event.body.fileId;
+
+            // If there's an image file, upload it
+            if (this.imageFile) {
+              this.fileService.uploadFile(this.imageFile).subscribe({
+                next: (imageEvent: any) => {
+                  if (imageEvent.body) {
+                    const imageFileId = imageEvent.body.fileId;
+                    this.submitTrack(audioFileId, imageFileId);
+                  }
+                },
+                error: (err) => {
+                  console.error('Error uploading image file:', err);
+                }
+              });
+            } else {
+              // No image file, submit track with only audio
+              this.submitTrack(audioFileId, '');
+            }
+          }
+        },
+        error: (err) => {
+          console.error('Error uploading audio file:', err);
+        }
+      });
+    }
   }
 
-  private generateId(): string {
-    return 'track-' + Math.random().toString(36).substr(2, 9);
+  private submitTrack(audioFileId: string, imageFileId: string) {
+    const formData = this.trackForm.value;
+
+    const track: SongRequestDTO = {
+      ...formData,
+      id: "", // This will be generated by the backend
+      albumId: this.albumId ?? "",
+      audioFileId: audioFileId,
+      imageUrl: imageFileId || "",
+    };
+
+    // Dispatch action to create track
+    this.store.dispatch(TrackActions.createTrack({ track }));
+
+    // Navigate back to album details
+    this.router.navigate(["/albums", this.albumId]);
   }
 }

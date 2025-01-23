@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class SongController {
 
     private final SongService songService;
 
 
     @GetMapping({"/user/songs", "/admin/songs"})
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN','CONTENT_MANAGER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Page<SongResponseDTO>> getAllChansons(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -31,7 +32,7 @@ public class SongController {
     }
 
     @GetMapping({"/user/songs/search", "/admin/songs/search"})
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN','CONTENT_MANAGER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Page<SongResponseDTO>> searchChansonsByTitle(
             @RequestParam String title,
             @RequestParam(defaultValue = "0") int page,
@@ -42,7 +43,7 @@ public class SongController {
     }
 
     @GetMapping({"/user/songs/album", "/admin/songs/album"})
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN','CONTENT_MANAGER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Page<SongResponseDTO>> getSongsByAlbumId(
             @RequestParam String albumId,
             @RequestParam(defaultValue = "0") int page,

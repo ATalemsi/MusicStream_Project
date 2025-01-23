@@ -20,7 +20,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,9 +63,13 @@ class AuthControllerSecurityTest {
         var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
         CustomUserDetails userDetails = new CustomUserDetails("user1", "password", true, authorities);
 
+        List<String> roleNames = authorities.stream()
+                .map(SimpleGrantedAuthority::getAuthority)
+                .collect(Collectors.toList()); // Convert authorities to List<String>
+
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(jwtTokenProvider.generateToken("user1")).thenReturn("mocked-token");
+        when(jwtTokenProvider.generateToken(userDetails.getUsername(), roleNames)).thenReturn("mocked-token"); // Pass List<String>
 
         // Act
         ResponseEntity<AuthResponse> response = authController.login(request);
@@ -72,8 +78,9 @@ class AuthControllerSecurityTest {
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("mocked-token", Objects.requireNonNull(response.getBody()).getToken());
         assertEquals("user1", response.getBody().getUsername());
-        assertEquals(authorities, response.getBody().getRoles());
+        assertEquals(roleNames, response.getBody().getRoles());
     }
+
 
     @Test
     void login_ShouldThrowExceptionOnInvalidCredentials() {
@@ -109,8 +116,12 @@ class AuthControllerSecurityTest {
         registeredUser.setPassword("password");
         registeredUser.setRoles(Collections.singletonList("ROLE_USER"));
 
+        List<String> roleNames = authorities.stream()
+                .map(SimpleGrantedAuthority::getAuthority)
+                .toList();
+
         when(userService.register(userDTO)).thenReturn(registeredUser);
-        when(jwtTokenProvider.generateToken("newuser")).thenReturn("mocked-token");
+        when(jwtTokenProvider.generateToken(registeredUser.getUsername(), roleNames)).thenReturn("mocked-token");
 
         // Act
         ResponseEntity<AuthResponse> response = authController.register(userDTO);

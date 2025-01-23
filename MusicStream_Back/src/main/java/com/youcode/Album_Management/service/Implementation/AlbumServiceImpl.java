@@ -76,4 +76,11 @@ public class AlbumServiceImpl implements AlbumService {
                 .sorted(Comparator.comparing(AlbumResponseDTO::getTitle))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public AlbumResponseDTO getAlbumById(String id) {
+        Album album = albumRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Album not found with id: " + id)); // You can replace RuntimeException with a custom exception.
+        return albumMapper.toDTO(album);
+    }
 }
