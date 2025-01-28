@@ -1,25 +1,13 @@
 <div class="min-h-screen bg-purple-900">
-  <!-- Header -->
-  <header class="bg-purple-800 p-4 flex justify-between items-center">
-    <div class="flex items-center space-x-2">
-      <img src="/assets/harmony-logo.png" alt="Harmony" class="h-8 w-8" />
-      <span class="text-white text-xl font-semibold">Harmony</span>
-    </div>
-    <nav class="flex items-center space-x-4">
-      <button class="px-4 py-2 text-white rounded-lg hover:bg-purple-700">Library</button>
-      <button class="px-4 py-2 text-white rounded-lg hover:bg-purple-700">Albums</button>
-      <button class="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600">Add Track</button>
-      <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Logout</button>
-    </nav>
-  </header>
-
   <!-- Main Content -->
-  <main class="p-6">
+  <main class="p-6 mt-20">
     <!-- Album Header -->
     <div class="flex justify-between items-center mb-8">
       <div class="flex items-center space-x-3">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
         </svg>
         <h1 class="text-4xl font-bold text-white">Album Details</h1>
       </div>
@@ -48,11 +36,11 @@
             <p class="text-lg text-purple-300">{{ album.year }}</p>
           </div>
           <div class="flex space-x-4">
-            <button   *ngIf="isAdmin$ | async" (click)="onEditAlbum(album.id)"
+            <button *ngIf="isAdmin$ | async" (click)="onEditAlbum(album.id)"
                     class="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600">
               Edit Album
             </button>
-            <button   *ngIf="isAdmin$ | async" (click)="onAddTrack(album.id)"
+            <button *ngIf="isAdmin$ | async" (click)="onAddTrack(album.id)"
                     class="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600">
               Add Track
             </button>
@@ -60,10 +48,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Tracks Section -->
-    <!-- Previous content remains the same until Tracks Section -->
-
     <!-- Tracks Section -->
     <ng-container *ngIf="trackPage$ | async as trackPage">
       <div class="flex justify-between items-center mb-4">
@@ -90,9 +74,12 @@
               <button
                 (click)="onPlayTrack(track)"
                 class="p-3 bg-purple-600 rounded-full hover:bg-purple-500 transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
               </button>
 
@@ -112,8 +99,10 @@
               <button *ngIf="isAdmin$ | async"
                       (click)="onEditTrack(track.id!)"
                       class="p-2 text-purple-300 hover:text-purple-100 transition-colors duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                 </svg>
               </button>
 
@@ -121,8 +110,10 @@
               <button *ngIf="isAdmin$ | async"
                       (click)="onDeleteTrack(track.id!)"
                       class="p-2 text-red-400 hover:text-red-300 transition-colors duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                 </svg>
               </button>
             </div>
@@ -146,7 +137,9 @@
             [disabled]="trackPage.number === 0"
             class="p-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+              <path fill-rule="evenodd"
+                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                    clip-rule="evenodd"/>
             </svg>
           </button>
 
@@ -171,11 +164,167 @@
             [disabled]="trackPage.number >= trackPage.totalPages - 1"
             class="p-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              <path fill-rule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd"/>
             </svg>
           </button>
         </div>
       </div>
     </ng-container>
   </main>
+  <!-- Audio Player Section -->
+  <div *ngIf="currentTrack"
+       class="fixed bottom-0 left-0 right-0 bg-purple-800/95 backdrop-blur-lg border-t border-purple-700 shadow-lg z-50">
+    <!-- Progress Bar -->
+    <div class="relative h-1 bg-purple-700/50">
+      <ng-container *ngIf="{
+      current: formattedCurrentTime$ | async,
+      duration: formattedDuration$ | async
+    } as time">
+        <div class="absolute top-0 left-0 h-full bg-purple-400"
+             [style.width]="time.current && time.duration ? (time.current / time.duration * 100) + '%' : '0%'">
+        </div>
+        <input type="range"
+               [value]="time.current || 0"
+               [max]="time.duration || 100"
+               (input)="onSeek($event)"
+               class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer">
+      </ng-container>
+    </div>
+
+    <!-- Loading/Buffering Indicator -->
+    <ng-container *ngIf="playerState$ | async as state">
+      <div *ngIf="state === PlayerState.LOADING || state === PlayerState.BUFFERING"
+           class="absolute top-0 left-0 right-0 h-1">
+        <div class="h-full bg-purple-400 animate-pulse"></div>
+      </div>
+    </ng-container>
+
+    <!-- Player Content -->
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between gap-4">
+        <!-- Track Info -->
+        <div class="flex items-center space-x-4 min-w-[200px] max-w-[300px]">
+          <div class="flex-shrink-0">
+            <div class="w-14 h-14 bg-purple-700 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-300" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+              </svg>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-white font-medium truncate">{{ currentTrack.title }}</h4>
+            <p class="text-purple-300 text-sm">Track {{ currentTrack.trackNumber }}</p>
+          </div>
+        </div>
+
+        <!-- Player Controls -->
+        <div class="flex flex-col items-center flex-1 max-w-2xl">
+          <!-- Main Controls -->
+          <div class="flex items-center justify-center space-x-6">
+            <!-- Previous Button -->
+            <button (click)="onPreviousTrack()"
+                    class="p-2 text-purple-300 hover:text-white transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+              </svg>
+            </button>
+
+            <!-- Play/Pause Button -->
+            <ng-container *ngIf="playerState$ | async as state">
+              <button (click)="state === PlayerState.PLAYING ? onPauseTrack() : onPlayTrack(currentTrack)"
+                      class="p-4 bg-white rounded-full hover:bg-purple-100 transition-all transform hover:scale-105">
+                <svg *ngIf="state !== PlayerState.PLAYING"
+                     xmlns="http://www.w3.org/2000/svg"
+                     class="h-6 w-6 text-purple-900"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                </svg>
+                <svg *ngIf="state === PlayerState.PLAYING"
+                     xmlns="http://www.w3.org/2000/svg"
+                     class="h-6 w-6 text-purple-900"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </button>
+            </ng-container>
+
+            <!-- Next Button -->
+            <button (click)="onNextTrack()"
+                    class="p-2 text-purple-300 hover:text-white transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Progress Bar Container -->
+          <div class="relative h-2 group">
+                          <ng-container *ngIf="{
+                  current: formattedCurrentTime$ | async,
+                  duration: formattedDuration$ | async
+                } as time">
+              <!-- Background Track -->
+              <div class="absolute inset-0 bg-purple-800/30 rounded-full overflow-hidden">
+                <!-- Progress Fill -->
+                <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-purple-400 transition-all duration-150 group-hover:from-purple-400 group-hover:to-purple-300"
+                     [style.width]="getProgressPercentage(time.current || 0, time.duration || 100) + '%'">
+                  <!-- Progress Handle -->
+                  <div class="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-150 transform hover:scale-110"></div>
+                </div>
+              </div>
+
+              <!-- Interactive Range Input -->
+              <input type="range"
+                     [value]="time.current || 0"
+                     [max]="time.duration || 100"
+                     (input)="onSeek($event)"
+                     class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-10
+                  hover:accent-purple-300">
+
+              <!-- Time Display -->
+              <div class="absolute -bottom-6 left-0 right-0 flex justify-between text-xs font-medium text-purple-300 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <span>{{ formatTime(time.current || 0) }}</span>
+                <span>{{ formatTime(time.duration || 0) }}</span>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Volume Control -->
+        <div class="flex items-center space-x-2 min-w-[200px] justify-end">
+          <button class="p-2 text-purple-300 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+            </svg>
+          </button>
+          <div class="w-24">
+            <input type="range"
+                   min="0"
+                   max="1"
+                   step="0.01"
+                   class="w-full h-1 bg-purple-700 rounded-lg appearance-none cursor-pointer"
+                   (input)="onVolumeChange($event)">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spacer for fixed player -->
+  <div *ngIf="currentTrack" class="h-24"></div>
 </div>
