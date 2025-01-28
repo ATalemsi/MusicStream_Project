@@ -16,4 +16,6 @@ public class SongResponseDTO {
     private Integer trackNumber;
 
     private String albumId;
+
+    private String audioFileId;
 }

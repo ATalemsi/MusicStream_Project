@@ -1,113 +1,118 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from "@angular/common";
 import { Store } from '@ngrx/store';
-import {MusicCategory, SongRequestDTO, Track} from "../../../../core/models/track.model";
-import * as TrackActions from "../../../store/track/track.actions";
-import {CommonModule} from "@angular/common";
-import {NavbarComponent} from "../../../navbar/navbar.component";
+import { Observable, Subscription } from 'rxjs';
+import { createTrack} from "../../../store/track/track.actions";
+import { selectTrackError, selectTrackLoading } from "../../../store/track/track.selectors";
+import { Track, MusicCategory } from 'src/app/core/models/track.model';
+import {TrackService} from "../../../../core/services/track/track.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {UploadFileService} from "../../../../core/services/upload-file/upload-file.service";
 
 @Component({
   selector: 'app-add-track',
   standalone: true,
   imports: [
-    ReactiveFormsModule, CommonModule, NavbarComponent
+    ReactiveFormsModule, CommonModule
   ],
   templateUrl: './add-track.component.html',
-  styleUrl: './add-track.component.scss'
+  styleUrls: ['./add-track.component.scss']
 })
-export class AddTrackComponent implements OnInit {
-    trackForm: FormGroup
-    albumId: string | undefined
-    categories = Object.values(MusicCategory)
-    audioFile: File | null = null
-    imageFile: File | null = null
+export class AddTrackComponent implements OnInit, OnDestroy {
+  trackForm: FormGroup;
+  categories: string[] = Object.values(MusicCategory);
+  selectedFile: File | null = null;
+  error$: Observable<string | null>;
+  loading$: Observable<boolean>;
+  albumId: string | undefined;
+  private readonly subscription: Subscription = new Subscription();
 
   constructor(
-    private readonly fb: FormBuilder,
+    private readonly formBuilder: FormBuilder,
     private readonly store: Store,
+    private readonly trackService: TrackService,
+    private readonly router: Router,
     private readonly route: ActivatedRoute,
-    protected readonly router: Router,
-    private readonly fileService: UploadFileService
   ) {
-    this.trackForm = this.fb.group({
-      title: ["", Validators.required],
-      artist: ["", Validators.required],
-      description: [""],
-      duration: [0, [Validators.required, Validators.min(0)]],
-      category: [MusicCategory.OTHER, Validators.required],
-    })
+
+    this.trackForm = this.formBuilder.group({
+      title: ['', [Validators.required, Validators.maxLength(100)]],
+      description: ['', Validators.maxLength(100)],
+      duree: [null, [Validators.required, Validators.min(1)]],
+      trackNumber: [null, [Validators.required, Validators.min(1)]],
+      category: [null],
+      albumId: ['']
+    });
+
+    this.error$ = this.store.select(selectTrackError);
+    this.loading$ = this.store.select(selectTrackLoading);
   }
+
   ngOnInit() {
     this.albumId = this.route.snapshot.paramMap.get("id") ?? ""
+    this.trackForm.patchValue({
+      albumId: this.albumId
+    });
   }
 
-  onAudioFileChange(event: Event) {
-    const element = event.currentTarget as HTMLInputElement
-    const file = element.files ? element.files[0] : null
-    if (file) {
-      this.audioFile = file
-    }
-  }
+  onSubmit(): void {
+    if (this.trackForm.valid && this.selectedFile) {
+      const trackData: Track = this.trackForm.value;
+      console.log('Submitting Track Data:', trackData);
+      console.log('Selected File:', this.selectedFile);
 
-  onImageFileChange(event: Event) {
-    const element = event.currentTarget as HTMLInputElement
-    const file = element.files ? element.files[0] : null
-    if (file) {
-      this.imageFile = file
-    }
-  }
-
-  onSubmit() {
-    if (this.trackForm.valid && this.audioFile) {
-      // Upload the audio file
-      this.fileService.uploadFile(this.audioFile).subscribe({
-        next: (event: any) => {
-          if (event.body) {
-            const audioFileId = event.body.fileId;
-
-            // If there's an image file, upload it
-            if (this.imageFile) {
-              this.fileService.uploadFile(this.imageFile).subscribe({
-                next: (imageEvent: any) => {
-                  if (imageEvent.body) {
-                    const imageFileId = imageEvent.body.fileId;
-                    this.submitTrack(audioFileId, imageFileId);
-                  }
-                },
-                error: (err) => {
-                  console.error('Error uploading image file:', err);
-                }
-              });
-            } else {
-              // No image file, submit track with only audio
-              this.submitTrack(audioFileId, '');
-            }
-          }
+      this.trackService.createTrack(trackData, this.selectedFile).subscribe(
+        (response) => {
+          console.log('Track created successfully', response);
+          this.router.navigate(["/albums", this.albumId]);
         },
-        error: (err) => {
-          console.error('Error uploading audio file:', err);
+        (error) => {
+          console.error('Error creating track', error);
         }
+      );
+    } else {
+      Object.keys(this.trackForm.controls).forEach(key => {
+        const control = this.trackForm.get(key);
+        control?.markAsTouched();
       });
     }
   }
 
-  private submitTrack(audioFileId: string, imageFileId: string) {
-    const formData = this.trackForm.value;
 
-    const track: SongRequestDTO = {
-      ...formData,
-      id: "", // This will be generated by the backend
-      albumId: this.albumId ?? "",
-      audioFileId: audioFileId,
-      imageUrl: imageFileId || "",
-    };
+  onFileSelected(event: Event): void {
+    const element = event.target as HTMLInputElement;
+    const fileList: FileList | null = element.files;
 
-    // Dispatch action to create track
-    this.store.dispatch(TrackActions.createTrack({ track }));
+    if (fileList && fileList.length > 0) {
+      const file = fileList[0];
+      const allowedFormats = ['audio/mpeg', 'audio/wav'];
+      const maxSize = 10 * 1024 * 1024; // 10 MB
 
-    // Navigate back to album details
-    this.router.navigate(["/albums", this.albumId]);
+      if (!allowedFormats.includes(file.type)) {
+        alert('Invalid file format. Only MP3 and WAV files are allowed.');
+        this.selectedFile = null;
+        return;
+      }
+
+      if (file.size > maxSize) {
+        alert('File size exceeds 10 MB.');
+        this.selectedFile = null;
+        return;
+      }
+
+      this.selectedFile = file;
+    } else {
+      this.selectedFile = null;
+    }
+  }
+
+  onCancel(): void {
+    // Implement cancel logic (e.g., navigate back or reset form)
+    this.trackForm.reset();
+    this.selectedFile = null;
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }
