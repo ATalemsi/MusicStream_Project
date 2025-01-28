@@ -1,15 +1,36 @@
-import { createFeatureSelector, createSelector } from "@ngrx/store"
-import { TrackState } from "./track.reducer"
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import {Track, TrackPage} from '../../../core/models/track.model';
 
-export const selectTrackState = createFeatureSelector<TrackState>("track")
+export interface TrackState {
+  tracks: Track[];
+  trackPage: TrackPage | null;
+  loading: boolean;
+  error: string | null;
+}
 
-export const selectAllTracks = createSelector(selectTrackState, (state: TrackState) => state?.tracks ?? [])
+export const selectTrackState = createFeatureSelector<TrackState>('track');
 
-export const selectTracksLoading = createSelector(selectTrackState, (state: TrackState) => state?.loading ?? false)
+export const selectTracks = createSelector(
+  selectTrackState,
+  (state: TrackState) => state?.tracks ?? []
+);
 
-export const selectTracksError = createSelector(selectTrackState, (state: TrackState) => state?.error ?? null)
+export const selectAlbumTracks = createSelector(
+  selectTracks,
+  (tracks: Track[]) => tracks ?? []
+);
 
-export const selectTracks = createSelector(selectTrackState, (state: TrackState) => state?.tracks ?? [])
+export const selectTrackLoading = createSelector(
+  selectTrackState,
+  (state: TrackState) => state?.loading ?? false
+);
 
-export const selectAlbumTracks = createSelector(selectTracks, (tracks) => tracks)
+export const selectTrackError = createSelector(
+  selectTrackState,
+  (state: TrackState) => state?.error ?? null
+);
 
+export const selectTrackPage = createSelector(
+  selectTrackState,
+  (state: TrackState) => state.trackPage
+);

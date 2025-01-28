@@ -1,0 +1,181 @@
+<div class="min-h-screen bg-purple-900">
+  <!-- Header -->
+  <header class="bg-purple-800 p-4 flex justify-between items-center">
+    <div class="flex items-center space-x-2">
+      <img src="/assets/harmony-logo.png" alt="Harmony" class="h-8 w-8" />
+      <span class="text-white text-xl font-semibold">Harmony</span>
+    </div>
+    <nav class="flex items-center space-x-4">
+      <button class="px-4 py-2 text-white rounded-lg hover:bg-purple-700">Library</button>
+      <button class="px-4 py-2 text-white rounded-lg hover:bg-purple-700">Albums</button>
+      <button class="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600">Add Track</button>
+      <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Logout</button>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="p-6">
+    <!-- Album Header -->
+    <div class="flex justify-between items-center mb-8">
+      <div class="flex items-center space-x-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+        </svg>
+        <h1 class="text-4xl font-bold text-white">Album Details</h1>
+      </div>
+      <button (click)="onBackToList()" class="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600">
+        Back to List
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading$ | async" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error$ | async as error" class="max-w-2xl mx-auto mb-6 p-4 bg-red-500/10 text-red-200 rounded-lg">
+      {{ error }}
+    </div>
+
+    <!-- Album Details -->
+    <div *ngIf="albumDetails$ | async as album" class="bg-purple-800/50 rounded-xl overflow-hidden mb-8">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h2 class="text-3xl font-bold text-white mb-2">{{ album.title }}</h2>
+            <p class="text-xl text-purple-200 mb-2">{{ album.artist }}</p>
+            <p class="text-lg text-purple-300">{{ album.year }}</p>
+          </div>
+          <div class="flex space-x-4">
+            <button   *ngIf="isAdmin$ | async" (click)="onEditAlbum(album.id)"
+                    class="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600">
+              Edit Album
+            </button>
+            <button   *ngIf="isAdmin$ | async" (click)="onAddTrack(album.id)"
+                    class="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600">
+              Add Track
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tracks Section -->
+    <!-- Previous content remains the same until Tracks Section -->
+
+    <!-- Tracks Section -->
+    <ng-container *ngIf="trackPage$ | async as trackPage">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-2xl font-semibold text-white">Tracks</h3>
+        <select
+          (change)="changeSorting($event)"
+          class="bg-purple-700 text-white border border-purple-600 rounded-lg px-3 py-2">
+          <option value="title">Sort by Title</option>
+          <option value="duration">Sort by Duration</option>
+        </select>
+      </div>
+
+      <div *ngIf="trackPage.content.length === 0" class="bg-purple-800/50 rounded-lg p-6 text-center">
+        <p class="text-xl text-white">No tracks for this album</p>
+      </div>
+
+      <!-- Tracks List -->
+      <div class="grid gap-4">
+        <div *ngFor="let track of trackPage.content"
+             class="bg-purple-800/50 rounded-lg p-6 hover:bg-purple-700/50 transition-all duration-200">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4 flex-1">
+              <!-- Play Button -->
+              <button
+                (click)="onPlayTrack(track)"
+                class="p-3 bg-purple-600 rounded-full hover:bg-purple-500 transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+
+              <div>
+                <h4 class="text-lg font-medium text-white">{{ track.title }}</h4>
+                <div class="flex items-center space-x-2 mt-1">
+                  <span class="text-sm text-purple-300">{{ track.duree }}s</span>
+                  <span class="text-purple-400">•</span>
+                  <span class="text-sm text-purple-300">Track {{ track.trackNumber }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center space-x-3">
+              <!-- Edit Button -->
+              <button *ngIf="isAdmin$ | async"
+                      (click)="onEditTrack(track.id!)"
+                      class="p-2 text-purple-300 hover:text-purple-100 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+
+              <!-- Delete Button -->
+              <button *ngIf="isAdmin$ | async"
+                      (click)="onDeleteTrack(track.id!)"
+                      class="p-2 text-red-400 hover:text-red-300 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="mt-8 flex flex-col items-center space-y-4">
+        <!-- Page Info -->
+        <div class="text-purple-300 text-sm">
+          Showing page {{ trackPage.number + 1 }} of {{ trackPage.totalPages }}
+          ({{ trackPage.totalElements }} tracks total)
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="flex items-center space-x-2">
+          <!-- Previous Page Button -->
+          <button
+            (click)="loadMoreTracks(trackPage.number - 1)"
+            [disabled]="trackPage.number === 0"
+            class="p-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+
+          <!-- Page Numbers -->
+          <div class="flex space-x-1">
+            <button
+              *ngFor="let page of getPageNumbers(trackPage.totalPages)"
+              (click)="loadMoreTracks(page)"
+              [class.bg-purple-500]="trackPage.number === page"
+              class="px-3 py-1 rounded-lg text-sm transition-all duration-200"
+              [ngClass]="{
+            'bg-purple-700 text-white hover:bg-purple-600': trackPage.number !== page,
+            'bg-purple-500 text-white': trackPage.number === page
+          }">
+              {{ page + 1 }}
+            </button>
+          </div>
+
+          <!-- Next Page Button -->
+          <button
+            (click)="loadMoreTracks(trackPage.number + 1)"
+            [disabled]="trackPage.number >= trackPage.totalPages - 1"
+            class="p-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </main>
+</div>
