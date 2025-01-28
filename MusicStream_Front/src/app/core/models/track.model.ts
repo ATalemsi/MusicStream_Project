@@ -6,7 +6,7 @@ export interface Track {
   trackNumber: number;
   albumId: string;
   category?: MusicCategory;
-  audioFile: string;
+  audioFileId: string;
 }
 
 export interface TrackPage {

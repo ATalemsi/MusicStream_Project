@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { PlayerState, Track } from "../../models/track.model";
-import { BehaviorSubject, Observable } from "rxjs";
-import { TrackService} from "../track/track.service";// Import TrackService
+import { BehaviorSubject } from "rxjs";
+import {HttpClient} from "@angular/common/http";
+import {environment} from "../../../../environments/environment";
+
+// Import TrackService
 
 @Injectable({
   providedIn: 'root'
@@ -23,12 +26,17 @@ export class AudioPlayerService {
 
   private playlist: Track[] = [];
 
-  constructor(private readonly trackService: TrackService) {
+  constructor(
+    private readonly http: HttpClient
+  ) {
     this.audioContext = new AudioContext();
     this.audioElement = new Audio();
     this.setupAudioEventListeners();
   }
 
+  private getAuthToken(): string {
+    return localStorage.getItem('token') ?? '';
+  }
   private setupAudioEventListeners(): void {
     this.audioElement.addEventListener('timeupdate', () => {
       this.currentTimeSubject.next(this.audioElement.currentTime * 1000);
@@ -63,7 +71,42 @@ export class AudioPlayerService {
       if (this.currentTrack?.id !== track.id) {
         this.currentTrack = track;
         this.playerStateSubject.next(PlayerState.LOADING);
+
+        if (track.audioFileId) {
+          const response = await fetch(
+            `${environment.apiUrl}/api/user/songs/stream/${track.audioFileId}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${this.getAuthToken()}`
+              }
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          // Get the content type from the response
+          const contentType = response.headers.get('content-type');
+          console.log('Content Type:', contentType); // Debug log
+
+          // Create a new blob with the correct content type
+          const arrayBuffer = await response.arrayBuffer();
+          const blob = new Blob([arrayBuffer], { type: contentType || 'audio/mpeg' });
+          const blobUrl = URL.createObjectURL(blob);
+
+          // Clean up old blob URL
+          if (this.audioElement.src.startsWith('blob:')) {
+            URL.revokeObjectURL(this.audioElement.src);
+          }
+
+          this.audioElement.src = blobUrl;
+          await this.audioElement.load();
+        } else {
+          throw new Error('No audio file ID available');
+        }
       }
+
       await this.audioElement.play();
       this.playerStateSubject.next(PlayerState.PLAYING);
     } catch (error) {
