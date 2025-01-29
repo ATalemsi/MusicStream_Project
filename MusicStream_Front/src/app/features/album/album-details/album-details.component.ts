@@ -80,7 +80,13 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
     this.formattedDuration$ = this.duration$.pipe(
       map(duration => Math.max(0, duration)) // Ensure positive number
     );
-
+    this.subscription.add(
+      this.audioPlayerService.currentTrack$.subscribe((track) => {
+        if (track) {
+          this.currentTrack = track
+        }
+      }),
+    );
     // Debug subscriptions
     this.setupDebugSubscriptions();
   }
@@ -221,6 +227,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
   onBackToList(): void {
     this.router.navigate(["/albums"]);
   }
+
 
   loadMoreTracks(page: number): void {
     this.currentPage = page;
