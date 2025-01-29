@@ -38,8 +38,8 @@ export class AddTrackComponent implements OnInit, OnDestroy {
     this.trackForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', Validators.maxLength(100)],
-      duree: [null, [Validators.required, Validators.min(1)]],
-      trackNumber: [null, [Validators.required, Validators.min(1)]],
+      duree: [{ value: null, disabled: true }], // Disabled as it will be auto-calculated
+      trackNumber: [{ value: null, disabled: true }],
       category: [null],
       albumId: ['']
     });
@@ -51,12 +51,21 @@ export class AddTrackComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.albumId = this.route.snapshot.paramMap.get("id") ?? ""
     this.trackForm.patchValue({
-      albumId: this.albumId
+      albumId: this.albumId,
+      trackNumber: this.generateTrackNumber()
     });
+  }
+  private generateTrackNumber(): number {
+    // Generate a unique number based on current timestamp
+    return Date.now() % 1000000; // Use last 6 digits of timestamp
   }
 
   onSubmit(): void {
     if (this.trackForm.valid && this.selectedFile) {
+      // Enable disabled controls before getting form value
+      this.trackForm.get('duree')?.enable();
+      this.trackForm.get('trackNumber')?.enable();
+
       const trackData: Track = this.trackForm.value;
       console.log('Submitting Track Data:', trackData);
       console.log('Selected File:', this.selectedFile);
@@ -70,6 +79,9 @@ export class AddTrackComponent implements OnInit, OnDestroy {
           console.error('Error creating track', error);
         }
       );
+      // Disable controls again
+      this.trackForm.get('duree')?.disable();
+      this.trackForm.get('trackNumber')?.disable();
     } else {
       Object.keys(this.trackForm.controls).forEach(key => {
         const control = this.trackForm.get(key);
@@ -79,7 +91,32 @@ export class AddTrackComponent implements OnInit, OnDestroy {
   }
 
 
-  onFileSelected(event: Event): void {
+  private async getAudioDuration(file: File): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const audio = new Audio();
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          audio.src = e.target.result as string;
+        }
+      };
+
+      audio.onloadedmetadata = () => {
+        const durationInMs = Math.round(audio.duration * 1000);
+        URL.revokeObjectURL(audio.src); // Clean up
+        resolve(durationInMs);
+      };
+
+      audio.onerror = (error) => {
+        reject(error);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async onFileSelected(event: Event): Promise<void> {
     const element = event.target as HTMLInputElement;
     const fileList: FileList | null = element.files;
 
@@ -99,15 +136,26 @@ export class AddTrackComponent implements OnInit, OnDestroy {
         this.selectedFile = null;
         return;
       }
+      try {
+        const duration = await this.getAudioDuration(file);
 
-      this.selectedFile = file;
+        this.trackForm.patchValue({
+          duree: duration
+        });
+
+        this.selectedFile = file;
+      } catch (error) {
+        console.error('Error getting audio duration:', error);
+        alert('Error reading audio file. Please try again.');
+        this.selectedFile = null;
+      }
     } else {
       this.selectedFile = null;
     }
   }
 
   onCancel(): void {
-    // Implement cancel logic (e.g., navigate back or reset form)
+
     this.trackForm.reset();
     this.selectedFile = null;
   }

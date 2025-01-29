@@ -15,3 +15,39 @@
 
 /* Add any additional custom styles here */
 
+// Style the select dropdown
+select {
+  // Remove default select styling
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  // Custom styles for the options
+  option {
+    padding: 8px;
+    margin: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: theme('colors.purple.800') !important;
+    }
+
+    &:checked {
+      background-color: theme('colors.purple.700') !important;
+    }
+  }
+}
+
+// Firefox specific styles
+@-moz-document url-prefix() {
+  select {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.05);
+
+    option {
+      background-color: theme('colors.purple.900');
+      color: white;
+    }
+  }
+}
+
