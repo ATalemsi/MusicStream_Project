@@ -52,12 +52,23 @@
     <ng-container *ngIf="trackPage$ | async as trackPage">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-2xl font-semibold text-white">Tracks</h3>
-        <select
-          (change)="changeSorting($event)"
-          class="bg-purple-700 text-white border border-purple-600 rounded-lg px-3 py-2">
-          <option value="title">Sort by Title</option>
-          <option value="duration">Sort by Duration</option>
-        </select>
+        <div class="flex items-center space-x-4">
+          <!-- Search Input -->
+          <input
+            type="text"
+            placeholder="Search tracks..."
+            (input)="onSearchTracks($event)"
+            class="bg-purple-700 text-white border border-purple-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+          <!-- Sorting Dropdown -->
+          <select
+            (change)="changeSorting($event)"
+            class="bg-purple-700 text-white border border-purple-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="title">Sort by Title</option>
+            <option value="duration">Sort by Duration</option>
+          </select>
+        </div>
       </div>
 
       <div *ngIf="trackPage.content.length === 0" class="bg-purple-800/50 rounded-lg p-6 text-center">

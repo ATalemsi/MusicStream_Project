@@ -98,7 +98,7 @@ public class SongController {
     public ResponseEntity<SongResponseDTO> updateSong(
             @PathVariable String id,
             @RequestParam("song") String songJson,
-            @RequestParam(value = "audioFile") MultipartFile file) throws IOException {
+            @RequestParam(value = "audioFile" , required = false) MultipartFile file) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         SongRequestDTO songRequestDTO = objectMapper.readValue(songJson, SongRequestDTO.class);
         return ResponseEntity.ok(songService.updateSong(id, songRequestDTO, file));
@@ -128,16 +128,13 @@ public class SongController {
                 response.setStatus(HttpStatus.NOT_FOUND.value());
                 return;
             }
-
             long fileSize = resource.contentLength();
             String contentType = resource.getContentType();
             InputStream inputStream = resource.getInputStream();
 
-            // Parse range header
             String rangeHeader = request.getHeader("Range");
             long start = 0;
             long end = fileSize - 1;
-
             if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
                 String[] ranges = rangeHeader.substring(6).split("-");
                 start = Long.parseLong(ranges[0]);
@@ -145,14 +142,9 @@ public class SongController {
                     end = Long.parseLong(ranges[1]);
                 }
             }
-
-            // Calculate content length
             long contentLength = end - start + 1;
-
-            // Set response headers
             response.setHeader(HttpHeaders.CONTENT_TYPE, contentType);
             response.setHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
-
             if (rangeHeader != null) {
                 response.setStatus(HttpStatus.PARTIAL_CONTENT.value());
                 response.setHeader(HttpHeaders.CONTENT_RANGE,
@@ -160,16 +152,11 @@ public class SongController {
             } else {
                 response.setStatus(HttpStatus.OK.value());
             }
-
             response.setHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength));
             response.setHeader(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000");
-
-            // Skip to the requested byte range
             if (start > 0) {
                 inputStream.skip(start);
             }
-
-            // Stream the file
             try (InputStream is = inputStream) {
                 StreamUtils.copyRange(is, response.getOutputStream(), start, end);
             }
@@ -205,4 +192,35 @@ public class SongController {
             return new long[]{0, fileSize - 1};
         }
     }
+
+    @GetMapping({"/user/songs/{id}", "/admin/songs/{id}"})
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<SongResponseDTO> getSongById(@PathVariable String id) {
+        try {
+            SongResponseDTO song = songService.getSongById(id);
+            return ResponseEntity.ok(song);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid song ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            log.error("Error retrieving song with ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping({"/user/songs/album/{albumId}/search", "/admin/songs/album/{albumId}/search"})
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<Page<SongResponseDTO>> searchSongsByTitleInAlbum(
+            @PathVariable String albumId,
+            @RequestParam String title,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "title") String sortBy) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        return ResponseEntity.ok(
+                songService.searchSongsByTitleInAlbum(albumId, title, pageable)
+        );
+    }
+
 }

@@ -29,6 +29,24 @@ export class TrackService {
     return this.http.get<TrackPage>(`${this.apiUrl}/user/songs/search`, { params });
   }
 
+  searchSongsByTitleInAlbum(
+    albumId: string,
+    title: string,
+    page: number = 0,
+    size: number = 10,
+    sortBy: string = 'title'
+  ): Observable<TrackPage> {
+    const params = new HttpParams()
+      .set('title', title)
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', sortBy);
+
+    return this.http.get<TrackPage>(
+      `${this.apiUrl}/user/songs/album/${albumId}/search`,
+      { params }
+    );
+  }
   getTracksByAlbum(albumId: string, page: number = 0, size: number = 10, sortBy: string = 'title'): Observable<TrackPage> {
     const params = new HttpParams()
       .set('albumId', albumId)
@@ -46,14 +64,22 @@ export class TrackService {
   }
 
 
-  updateTrack(id: string, track: Track, audioFile: File): Observable<Track> {
+  updateTrack(id: string, track: Track, audioFile?: File): Observable<Track> {
     const formData = new FormData();
     formData.append('song', JSON.stringify(track));
-    formData.append('audioFile', audioFile);
+
+    if (audioFile) {
+      formData.append('audioFile', audioFile); // Append the file only if it exists
+    }
+
     return this.http.put<Track>(`${this.apiUrl}/admin/songs/${id}`, formData);
   }
 
   deleteTrack(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/admin/songs/${id}`);
+  }
+
+  getTrackById(id: string): Observable<Track> {
+    return this.http.get<Track>(`${this.apiUrl}/admin/songs/${id}`);
   }
 }

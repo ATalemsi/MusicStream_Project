@@ -8,6 +8,7 @@ import { TrackState } from './track.selectors';
 export const initialState: TrackState = {
   tracks: [],
   trackPage: null,
+  selectedTrack: null,
   loading: false,
   error: null
 };
@@ -27,6 +28,25 @@ export const trackReducer = createReducer(
     loading: false
   })),
 
+  on(TrackActions.searchTracksInAlbum, (state) => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+  on(TrackActions.searchTracksInAlbumSuccess, (state, { trackPage }) => ({
+    ...state,
+    trackPage,
+    tracks: trackPage.content,
+    loading: false,
+    error: null
+  })),
+  on(TrackActions.searchTracksInAlbumFailure, (state, { error }) => ({
+    ...state,
+    trackPage: null,
+    loading: false,
+    error
+  })),
+
   on(TrackActions.loadTracksByAlbum, (state) => ({
     ...state,
     loading: true,
@@ -44,7 +64,23 @@ export const trackReducer = createReducer(
     loading: false,
     error
   })),
-
+  on(TrackActions.loadTrackById, (state) => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+  on(TrackActions.loadTrackByIdSuccess, (state, { track }) => ({
+    ...state,
+    selectedTrack: track,
+    loading: false,
+    error: null
+  })),
+  on(TrackActions.loadTrackByIdFailure, (state, { error }) => ({
+    ...state,
+    selectedTrack: null,
+    loading: false,
+    error
+  })),
   on(TrackActions.createTrack, state => ({ ...state, loading: true })),
   on(TrackActions.createTrackSuccess, (state, { track }) => ({
     ...state,
@@ -72,7 +108,11 @@ export const trackReducer = createReducer(
   on(TrackActions.deleteTrack, state => ({ ...state, loading: true })),
   on(TrackActions.deleteTrackSuccess, (state, { id }) => ({
     ...state,
-    tracks: state.tracks.filter(track => track.id !== id),
+    tracks: state.tracks.filter(track => track.id !== id), // Remove the deleted track
+    trackPage: state.trackPage ? {
+      ...state.trackPage,
+      content: state.trackPage.content.filter(track => track.id !== id) // Remove from paginated list
+    } : null,
     loading: false
   })),
   on(TrackActions.deleteTrackFailure, (state, { error }) => ({

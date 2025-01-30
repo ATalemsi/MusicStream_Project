@@ -101,7 +101,6 @@ public class SongServiceImpl implements SongService {
         songRepository.deleteById(id);
     }
 
-    // Helper method to validate the uploaded file
     private void validateAudioFile(MultipartFile audioFile) {
         if (audioFile.getSize() > MAX_FILE_SIZE_MB) {
             throw new IllegalArgumentException("File size exceeds the 15MB limit");
@@ -120,5 +119,19 @@ public class SongServiceImpl implements SongService {
             }
         }
         return false;
+    }
+
+    @Override
+    public SongResponseDTO getSongById(String id) {
+        Song song = songRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Song not found"));
+
+        return songMapper.toDTO(song);
+    }
+
+    @Override
+    public Page<SongResponseDTO> searchSongsByTitleInAlbum(String albumId, String songTitle, Pageable pageable) {
+        return songRepository.findByAlbumIdAndTitleContainingIgnoreCase(albumId, songTitle, pageable)
+                .map(songMapper::toDTO);
     }
 }
