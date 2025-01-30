@@ -1,24 +1,23 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {BehaviorSubject, combineLatest, Observable, Subject, Subscription, takeUntil} from "rxjs";
-import { Store } from "@ngrx/store";
-import { ActivatedRoute, Router } from "@angular/router";
-import { selectAlbumDetails, selectError, selectLoading } from "../../store/album/album.selectors";
+import {Store} from "@ngrx/store";
+import {ActivatedRoute, Router} from "@angular/router";
+import {selectAlbumDetails, selectError, selectLoading} from "../../store/album/album.selectors";
 import * as AlbumActions from "../../store/album/album.actions";
 import * as TrackActions from "../../store/track/track.actions";
-import { AsyncPipe, NgClass, NgForOf, NgIf } from "@angular/common";
-import { selectAlbumTracks, selectTrackPage } from "../../store/track/track.selectors";
-import { Album } from "../../../core/models/album.model";
-import { PlayerState, Track, TrackPage } from "../../../core/models/track.model";
-import { selectIsAdmin } from "../../store/auth/auth.selectors";
-import { AuthState } from "../../store/auth/auth.reducer";
-import { AudioPlayerService } from "../../../core/services/audio-player/audio-player.service";
-import { FormatTimePipe } from "../../../shared/pipe/formatTime.pipe";
-import { map } from "rxjs/operators";
+import {AsyncPipe, NgClass, NgForOf, NgIf} from "@angular/common";
+import {selectAlbumTracks, selectTrackPage} from "../../store/track/track.selectors";
+import {Album} from "../../../core/models/album.model";
+import {PlayerState, Track, TrackPage} from "../../../core/models/track.model";
+import {selectIsAdmin} from "../../store/auth/auth.selectors";
+import {AuthState} from "../../store/auth/auth.reducer";
+import {AudioPlayerService} from "../../../core/services/audio-player/audio-player.service";
+import {map} from "rxjs/operators";
 
 @Component({
   selector: "app-album-details",
   standalone: true,
-  imports: [NgIf, AsyncPipe, NgForOf, NgClass, FormatTimePipe],
+  imports: [NgIf, AsyncPipe, NgForOf, NgClass],
   templateUrl: "./album-details.component.html",
   styleUrl: "./album-details.component.scss",
 })
@@ -36,6 +35,8 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
   trackPage$ = this.trackPageSubject.asObservable();
   private readonly subscription = new Subscription();
 
+  albumId: string | null = null;
+
   // Audio player observables
   playerState$: Observable<PlayerState>;
   currentTime$: Observable<number>;
@@ -48,6 +49,10 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
   currentPage = 0;
   pageSize = 10;
   private readonly destroy$ = new Subject<void>();
+
+  private readonly searchTermSubject = new BehaviorSubject<string>("");
+  searchTerm$ = this.searchTermSubject.asObservable();
+
 
   constructor(
     private readonly store: Store,
@@ -103,7 +108,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
     combineLatest([this.albumDetails$, this.albumTracks$])
       .pipe(takeUntil(this.destroy$))
       .subscribe(([album, tracks]) => {
-        console.log("Combined State:", { album, tracks });
+        console.log("Combined State:", {album, tracks});
       });
   }
 
@@ -111,7 +116,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const albumId: string = params["id"];
       if (albumId) {
-        this.store.dispatch(AlbumActions.loadAlbumById({ id: albumId }));
+        this.store.dispatch(AlbumActions.loadAlbumById({id: albumId}));
         this.store.dispatch(
           TrackActions.loadTracksByAlbum({
             albumId,
@@ -120,6 +125,18 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
             sortBy: "title",
           })
         );
+
+        this.searchTerm$.pipe(takeUntil(this.destroy$)).subscribe((searchTerm) => {
+          this.store.dispatch(
+            TrackActions.searchTracksInAlbum({
+              albumId,
+              title: searchTerm,
+              page: 0,
+              size: 10,
+              sortBy: "title",
+            })
+          );
+        });
       }
     });
   }
@@ -203,7 +220,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
   }
 
   getPageNumbers(totalPages: number): number[] {
-    return Array.from({ length: totalPages }, (_, i) => i);
+    return Array.from({length: totalPages}, (_, i) => i);
   }
 
   onEditAlbum(id: string): void {
@@ -216,12 +233,13 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
 
   onDeleteTrack(trackId: string): void {
     if (confirm("Are you sure you want to delete this track?")) {
-      this.store.dispatch(TrackActions.deleteTrack({ id: trackId }));
+      this.store.dispatch(TrackActions.deleteTrack({id: trackId}));
     }
   }
 
   onEditTrack(trackId: string): void {
-    // Implement edit track functionality
+    this.albumId = this.route.snapshot.paramMap.get("id") ?? "";
+    this.router.navigate(["/albums", this.albumId, "edit-track", trackId]);
   }
 
   onBackToList(): void {
@@ -248,7 +266,7 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
     const target = event.target as HTMLSelectElement;
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const albumId = params["id"];
-      console.log("Changing sort:", { albumId, sortBy: target.value });
+      console.log("Changing sort:", {albumId, sortBy: target.value});
       this.store.dispatch(
         TrackActions.loadTracksByAlbum({
           albumId,
@@ -258,5 +276,11 @@ export class AlbumDetailsComponent implements OnInit, OnDestroy {
         })
       );
     });
+  }
+
+  onSearchTracks(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const searchTerm = input.value.trim();
+    this.searchTermSubject.next(searchTerm);
   }
 }

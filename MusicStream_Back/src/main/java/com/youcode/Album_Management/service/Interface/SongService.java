@@ -13,4 +13,6 @@ public interface SongService {
     SongResponseDTO createSong(SongRequestDTO chansonDTO ,  MultipartFile audioFile);
     SongResponseDTO updateSong(String id, SongRequestDTO songDTO, MultipartFile audioFile);
     void deleteSong(String id);
+    SongResponseDTO getSongById(String id);
+    Page<SongResponseDTO> searchSongsByTitleInAlbum(String albumId, String songTitle, Pageable pageable);
 }

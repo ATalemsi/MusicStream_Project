@@ -32,7 +32,28 @@ export const searchTracksFailure = createAction(
   '[Track] Search Tracks Failure',
   props<{ error: any }>()
 );
+// Add these to your existing track.actions.ts
 
+export const searchTracksInAlbum = createAction(
+  '[Track] Search Tracks In Album',
+  props<{
+    albumId: string;
+    title: string;
+    page: number;
+    size: number;
+    sortBy: string
+  }>()
+);
+
+export const searchTracksInAlbumSuccess = createAction(
+  '[Track] Search Tracks In Album Success',
+  props<{ trackPage: TrackPage }>()
+);
+
+export const searchTracksInAlbumFailure = createAction(
+  '[Track] Search Tracks In Album Failure',
+  props<{ error: any }>()
+);
 export const loadTracksByAlbum = createAction(
   '[Track] Load Tracks By Album',
   props<{ albumId: string; page: number; size: number; sortBy: string }>()
@@ -65,7 +86,7 @@ export const createTrackFailure = createAction(
 
 export const updateTrack = createAction(
   '[Track] Update Track',
-  props<{ id: string; track: Track; audioFile: File }>()
+  props<{ id: string; track: Track; audioFile: File | undefined }>()
 );
 
 export const updateTrackSuccess = createAction(
@@ -90,5 +111,20 @@ export const deleteTrackSuccess = createAction(
 
 export const deleteTrackFailure = createAction(
   '[Track] Delete Track Failure',
+  props<{ error: any }>()
+);
+
+export const loadTrackById = createAction(
+  '[Track] Load Track By Id',
+  props<{ id: string }>()
+);
+
+export const loadTrackByIdSuccess = createAction(
+  '[Track] Load Track By Id Success',
+  props<{ track: Track }>()
+);
+
+export const loadTrackByIdFailure = createAction(
+  '[Track] Load Track By Id Failure',
   props<{ error: any }>()
 );

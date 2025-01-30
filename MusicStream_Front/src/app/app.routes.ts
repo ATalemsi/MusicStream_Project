@@ -65,12 +65,18 @@ export const routes: Routes = [
           import("./features/track/pages/add-track/add-track.component").then((m) => m.AddTrackComponent),
         canActivate: [() => AuthGuard(["ROLE_ADMIN"])],
       },
+      {
+        path: ":id/edit-track/:trackId", // Add this route for editing
+        loadComponent: () =>
+          import("./features/track/pages/add-track/add-track.component").then((m) => m.AddTrackComponent),
+        canActivate: [() => AuthGuard(["ROLE_ADMIN"])],
+      },
     ]
   },
   { path: '**', redirectTo: 'auth/login' },
   {
     path: '',
-    redirectTo: 'library',
+    redirectTo: 'albums',
     pathMatch: 'full'
   }
 ];

@@ -33,6 +33,22 @@ export class TrackEffects {
     )
   );
 
+  searchTracksInAlbum$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(TrackActions.searchTracksInAlbum),
+      mergeMap(({ albumId, title, page, size, sortBy }) =>
+        this.trackService.searchSongsByTitleInAlbum(albumId, title, page, size, sortBy).pipe(
+          map((trackPage) =>
+            TrackActions.searchTracksInAlbumSuccess({ trackPage })
+          ),
+          catchError((error) =>
+            of(TrackActions.searchTracksInAlbumFailure({ error }))
+          )
+        )
+      )
+    )
+  );
+
   loadTracksByAlbum$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TrackActions.loadTracksByAlbum),
@@ -81,8 +97,20 @@ export class TrackEffects {
     )
   );
 
+  loadTrackById$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(TrackActions.loadTrackById),
+      mergeMap(({ id }) =>
+        this.trackService.getTrackById(id).pipe(
+          map((track) => TrackActions.loadTrackByIdSuccess({ track })),
+          catchError((error) => of(TrackActions.loadTrackByIdFailure({ error })))
+        )
+      )
+    )
+  );
+
   constructor(
-    private actions$: Actions,
-    private trackService: TrackService
+    private readonly actions$: Actions,
+    private readonly trackService: TrackService
   ) {}
 }

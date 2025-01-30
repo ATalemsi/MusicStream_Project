@@ -3,8 +3,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { CommonModule } from "@angular/common";
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { createTrack} from "../../../store/track/track.actions";
-import { selectTrackError, selectTrackLoading } from "../../../store/track/track.selectors";
+import {createTrack, loadTrackById, updateTrack} from "../../../store/track/track.actions";
+import {selectSelectedTrack, selectTrackError, selectTrackLoading} from "../../../store/track/track.selectors";
 import { Track, MusicCategory } from 'src/app/core/models/track.model';
 import {TrackService} from "../../../../core/services/track/track.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -25,6 +25,8 @@ export class AddTrackComponent implements OnInit, OnDestroy {
   error$: Observable<string | null>;
   loading$: Observable<boolean>;
   albumId: string | undefined;
+  trackId: string | null = null; // Track ID for edit mode
+  isEditMode = false;
   private readonly subscription: Subscription = new Subscription();
 
   constructor(
@@ -49,11 +51,37 @@ export class AddTrackComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.albumId = this.route.snapshot.paramMap.get("id") ?? ""
-    this.trackForm.patchValue({
-      albumId: this.albumId,
-      trackNumber: this.generateTrackNumber()
-    });
+    this.albumId = this.route.snapshot.paramMap.get("id") ?? "";
+    this.trackId = this.route.snapshot.paramMap.get("trackId") ?? null;
+
+    if (this.trackId) {
+      // Edit mode: Load the track details
+      this.isEditMode = true;
+      this.store.dispatch(loadTrackById({ id: this.trackId }));
+
+      this.subscription.add(
+        this.store.select(selectSelectedTrack).subscribe((track) => {
+          if (track) {
+            this.trackForm.patchValue({
+              title: track.title,
+              description: track.description,
+              duree: track.duree,
+              trackNumber: track.trackNumber,
+              category: track.category?.valueOf(),
+              albumId: track.albumId
+            });
+            console.log('Track  Data:', track.category);
+          }
+        })
+      );
+    } else {
+      // Add mode: Generate a new track number
+      this.trackForm.patchValue({
+        albumId: this.albumId,
+        trackNumber: this.generateTrackNumber()
+      });
+    }
+
   }
   private generateTrackNumber(): number {
     // Generate a unique number based on current timestamp
@@ -70,15 +98,20 @@ export class AddTrackComponent implements OnInit, OnDestroy {
       console.log('Submitting Track Data:', trackData);
       console.log('Selected File:', this.selectedFile);
 
-      this.trackService.createTrack(trackData, this.selectedFile).subscribe(
-        (response) => {
-          console.log('Track created successfully', response);
-          this.router.navigate(["/albums", this.albumId]);
-        },
-        (error) => {
-          console.error('Error creating track', error);
-        }
-      );
+      if (this.isEditMode && this.trackId) {
+        // Dispatch update action
+        this.store.dispatch(updateTrack({
+          id: this.trackId,
+          track: trackData,
+          audioFile: this.selectedFile
+        }));
+      } else if (this.selectedFile) {
+        // Dispatch create action
+        this.store.dispatch(createTrack({
+          track: trackData,
+          audioFile: this.selectedFile
+        }));
+      }
       // Disable controls again
       this.trackForm.get('duree')?.disable();
       this.trackForm.get('trackNumber')?.disable();
@@ -88,6 +121,13 @@ export class AddTrackComponent implements OnInit, OnDestroy {
         control?.markAsTouched();
       });
     }
+    this.subscription.add(
+      this.store.select(selectTrackLoading).subscribe((loading) => {
+        if (!loading) {
+          this.router.navigate(["/albums", this.albumId]);
+        }
+      })
+    );
   }
 
 
