@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import {AuthGuard} from "./guards/auth.guard";
+import {UserListComponent} from "./features/user/user-list/user-list.component";
 
 export const routes: Routes = [
   {
@@ -16,18 +17,6 @@ export const routes: Routes = [
           import('./features/auth/register/register.component').then(m => m.RegisterComponent)
       }
     ]
-  },
-  {
-    path: 'library',
-    loadComponent: () =>
-      import('./features/library/pages/library-page/library-page.component').then(m => m.LibraryPageComponent),
-    canActivate: [() => AuthGuard(['ROLE_USER','ROLE_ADMIN'])],
-  },
-  {
-    path: 'track/:id',
-    loadComponent: () =>
-      import('./features/track/components/track-detail/track-detail.component').then(m => m.TrackDetailComponent),
-    canActivate: [() => AuthGuard(['ROLE_USER', 'ROLE_ADMIN'])],
   },
   {
     path: 'albums',
@@ -72,6 +61,12 @@ export const routes: Routes = [
         canActivate: [() => AuthGuard(["ROLE_ADMIN"])],
       },
     ]
+  },
+  {
+    path: 'users', // Add this route for the UserComponent
+    loadComponent: () =>
+      import('./features/user/user-list/user-list.component').then(m => m.UserListComponent),
+    canActivate: [() => AuthGuard(['ROLE_ADMIN'])], // Only accessible by ADMIN
   },
   { path: '**', redirectTo: 'auth/login' },
   {

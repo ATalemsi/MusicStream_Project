@@ -67,7 +67,7 @@ public class AlbumController {
         return ResponseEntity.ok(albumService.filterAlbumsByYear(year, pageable));
     }
 
-    @PostMapping({"/admin/albums", "/user/albums"})
+    @PostMapping("/admin/albums")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AlbumResponseDTO> createAlbum(@RequestBody AlbumRequestDTO albumDTO) {
         return ResponseEntity.ok(albumService.createAlbum(albumDTO));

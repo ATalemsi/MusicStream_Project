@@ -63,11 +63,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUserRoles(String id, List<String> roles) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        List<Role> updatedRoles = roles.stream().map(roleRepository::findByName).toList();
+        List<Role> updatedRoles = roles.stream()
+                .map(roleRepository::findByName)
+                .collect(Collectors.toList()); // Use collect instead of toList for Java 8 compatibility
         user.setRoles(updatedRoles);
         userRepository.save(user);
     }
-
     @Override
     public User loadUserByUsername(String username) {
         return userRepository.findByUsername(username)

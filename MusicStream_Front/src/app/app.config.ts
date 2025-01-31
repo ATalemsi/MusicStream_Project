@@ -17,6 +17,8 @@ import {albumReducer} from "./features/store/album/album.reducer";
 import {AlbumEffects} from "./features/store/album/album.effects";
 import {localStorageSync} from "ngrx-store-localstorage";
 import {LoggingInterceptor} from "./interceptors/logging.interceptors";
+import {userReducer} from "./features/store/user/user.reducer";
+import {UserEffects} from "./features/store/user/user.effects";
 
 export function localStorageSyncReducer(reducer: any): any {
   return localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -29,10 +31,10 @@ export const appConfig: ApplicationConfig = {
     { provide: HTTP_INTERCEPTORS, useClass: LoggingInterceptor, multi: true },
     provideRouter(routes , withViewTransitions()),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideStore({[trackFeatureKey]: trackReducer, auth: authReducer  , albums: albumReducer} ,
+    provideStore({[trackFeatureKey]: trackReducer, auth: authReducer  , albums: albumReducer , user: userReducer} ,
       { metaReducers }
     ),
-    provideEffects([TrackEffects , AuthEffects , AlbumEffects ]),
+    provideEffects([TrackEffects , AuthEffects , AlbumEffects , UserEffects ]),
     provideAnimations(),
     provideImageKitLoader('https://res.cloudinary.com/dz4pww2qv'),
     provideStoreDevtools({

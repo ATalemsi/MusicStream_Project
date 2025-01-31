@@ -3,6 +3,8 @@ package com.youcode.Album_Management.controller;
 import com.youcode.Album_Management.dto.response.UserResponseDTO;
 import com.youcode.Album_Management.service.Interface.UserService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +30,14 @@ public class UserController {
     @PutMapping("/{id}/roles")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updateUserRoles(@PathVariable String id, @RequestBody List<String> roles) {
-        userService.updateUserRoles(id, roles);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        Logger logger = LoggerFactory.getLogger(UserController.class);
+        logger.info("Received roles: {}", roles);
+        try {
+            userService.updateUserRoles(id, roles);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (Exception e) {
+            logger.error("Error updating roles: ", e); // Log the error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
